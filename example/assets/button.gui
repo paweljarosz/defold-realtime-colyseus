@@ -1,0 +1,54 @@
+fonts {
+  name: "text"
+  font: "/example/assets/text.font"
+}
+textures {
+  name: "example"
+  texture: "/example/assets/example.atlas"
+}
+nodes {
+  size {
+    x: 190.0
+    y: 45.0
+  }
+  type: TYPE_BOX
+  texture: "example/grey_button10"
+  id: "bg"
+  layer: "bg"
+  inherit_alpha: true
+  slice9 {
+    x: 6.0
+    y: 5.0
+    z: 5.0
+    w: 10.0
+  }
+}
+nodes {
+  position {
+    y: 1.0
+  }
+  size {
+    x: 190.0
+    y: 40.0
+  }
+  color {
+    x: 0.125
+    y: 0.125
+    z: 0.125
+  }
+  type: TYPE_TEXT
+  text: "<text>"
+  font: "text"
+  id: "text"
+  parent: "bg"
+  layer: "text"
+  inherit_alpha: true
+}
+layers {
+  name: "bg"
+}
+layers {
+  name: "text"
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

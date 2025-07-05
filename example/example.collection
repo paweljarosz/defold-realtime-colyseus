@@ -1,0 +1,61 @@
+name: "examples"
+collection_instances {
+  id: "level"
+  collection: "/example/level.collection"
+  position {
+    z: 8.0
+  }
+}
+scale_along_z: 0
+embedded_instances {
+  id: "lobby"
+  data: "components {\n"
+  "  id: \"ui\"\n"
+  "  component: \"/example/lobby.gui\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "game"
+  data: "components {\n"
+  "  id: \"game\"\n"
+  "  component: \"/example/game.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"playerfactory\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/example/player.collection\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"opponentfactory\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/example/opponent.collection\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "camera"
+  data: "embedded_components {\n"
+  "  id: \"camera\"\n"
+  "  type: \"camera\"\n"
+  "  data: \"aspect_ratio: 1.0\\n"
+  "fov: 0.7854\\n"
+  "near_z: 0.1\\n"
+  "far_z: 1000.0\\n"
+  "auto_aspect_ratio: 1\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    y: 12.0
+    z: -18.0
+  }
+  rotation {
+    x: -1.4813443E-17
+    y: 0.9702957
+    z: 0.2419219
+    w: 5.941348E-17
+  }
+}

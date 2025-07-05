@@ -1,0 +1,299 @@
+script: "/example/lobby.gui_script"
+fonts {
+  name: "text"
+  font: "/example/assets/text.font"
+}
+textures {
+  name: "example"
+  texture: "/example/assets/example.atlas"
+}
+nodes {
+  position {
+    y: 822.0
+  }
+  type: TYPE_BOX
+  id: "root"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 320.0
+    y: -790.0
+  }
+  type: TYPE_TEMPLATE
+  id: "leave_lobby"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "leave_lobby/bg"
+  parent: "leave_lobby"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "LEAVE LOBBY"
+  id: "leave_lobby/text"
+  parent: "leave_lobby/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 320.0
+    y: -730.0
+  }
+  type: TYPE_TEMPLATE
+  id: "join_room"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "join_room/bg"
+  parent: "join_room"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "JOIN/CREATE ROOM"
+  id: "join_room/text"
+  parent: "join_room/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 95.0
+    y: -730.0
+  }
+  type: TYPE_TEMPLATE
+  id: "connect"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "connect/bg"
+  parent: "connect"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "CONNECT"
+  id: "connect/text"
+  parent: "connect/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 95.0
+    y: -730.0
+  }
+  type: TYPE_TEMPLATE
+  id: "disconnect"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "disconnect/bg"
+  parent: "disconnect"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "DISCONNECT"
+  id: "disconnect/text"
+  parent: "disconnect/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 320.0
+    y: -730.0
+  }
+  type: TYPE_TEMPLATE
+  id: "leave_room"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "leave_room/bg"
+  parent: "leave_room"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "LEAVE ROOM"
+  id: "leave_room/text"
+  parent: "leave_room/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 320.0
+    y: -790.0
+  }
+  type: TYPE_TEMPLATE
+  id: "join_lobby"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "join_lobby/bg"
+  parent: "join_lobby"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "JOIN LOBBY"
+  id: "join_lobby/text"
+  parent: "join_lobby/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 94.0
+    y: -790.0
+  }
+  type: TYPE_TEMPLATE
+  id: "get_room_list"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "get_room_list/bg"
+  parent: "get_room_list"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "GET ROOM LIST"
+  id: "get_room_list/text"
+  parent: "get_room_list/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 545.0
+    y: -730.0
+  }
+  type: TYPE_TEMPLATE
+  id: "create_room"
+  parent: "root"
+  inherit_alpha: true
+  template: "/example/assets/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "create_room/bg"
+  parent: "create_room"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "CREATE ROOM"
+  id: "create_room/text"
+  parent: "create_room/bg"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 320.0
+    y: -682.0
+  }
+  size {
+    x: 640.0
+    y: 680.0
+  }
+  type: TYPE_BOX
+  texture: "example/grey_button05"
+  id: "log"
+  yanchor: YANCHOR_BOTTOM
+  pivot: PIVOT_S
+  adjust_mode: ADJUST_MODE_ZOOM
+  parent: "root"
+  inherit_alpha: true
+  slice9 {
+    x: 5.0
+    y: 7.0
+    z: 5.0
+    w: 7.0
+  }
+}
+nodes {
+  position {
+    x: -310.0
+    y: 10.0
+  }
+  size {
+    x: 620.0
+    y: 660.0
+  }
+  color {
+    x: 0.102
+    y: 0.102
+    z: 0.102
+  }
+  type: TYPE_TEXT
+  text: "LOG"
+  font: "text"
+  id: "log_text"
+  pivot: PIVOT_SW
+  parent: "log"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    y: 702.0
+  }
+  size {
+    x: 40.0
+    y: 40.0
+  }
+  type: TYPE_BOX
+  texture: "example/grey_button10"
+  id: "hideshow/bg"
+  parent: "log"
+  inherit_alpha: true
+  slice9 {
+    x: 5.0
+    y: 5.0
+    z: 5.0
+    w: 10.0
+  }
+}
+nodes {
+  type: TYPE_BOX
+  texture: "example/grey_arrowDownGrey"
+  id: "hideshow/icon"
+  parent: "hideshow/bg"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+layers {
+  name: "bg"
+}
+layers {
+  name: "text"
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

@@ -1,0 +1,10 @@
+mesh: "/example/assets/models/dungeon/wall.gltf.glb"
+name: "wall"
+materials {
+  name: "texture"
+  material: "/example/assets/materials/unlit.material"
+  textures {
+    sampler: "texture0"
+    texture: "/example/assets/models/dungeon/dungeon_texture.png"
+  }
+}

@@ -1,0 +1,70 @@
+local client = require("example.client")
+
+local function spawn_player(self, player_nr)
+	local properties = {
+		[hash("/player")] = {
+			local_player = self.local_player_nr == player_nr,
+			player_nr = player_nr,
+		}
+	}
+	local ids = collectionfactory.create("#playerfactory", vmath.vector3(0), nil, properties)
+	local player = {
+		player_nr = player_nr,
+		ids = ids,
+		id = ids[hash("/player")],
+	}
+	self.players[player_nr] = player
+end
+
+local function delete_player(self, player_nr)
+	local player = self.players[player_nr]
+	if player then
+		go.delete(player.id, true)
+		self.players[player_nr] = nil
+	end
+end
+
+function init(self)
+	math.randomseed(os.time())
+
+	self.local_player_nr = nil
+	self.players = {}
+	
+	local app_id = "b9d1ec59-9fa5-4713-842b-418aeecf19ab"
+	local app_version = ""
+	client.init(app_id, app_version)
+	client.subscribe(msg.url())
+end
+
+function final(self)
+	client.unsubscribe(msg.url())
+end
+
+function update(self, dt)
+	if not realtime then return end
+	realtime.update()
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == client.EVENT then
+		local id = message.id
+		local data = message.data
+		if data.error_code and data.error_code > 0 then
+			print(data.error_string)
+			return
+		end
+		if id == realtime.EVENT_JOINRANDOMORCREATEROOMRETURN then
+			self.local_player_nr = data.local_player_nr
+		elseif id == realtime.EVENT_LEAVEROOMRETURN then
+			delete_player(self, self.local_player_nr)
+		elseif id == realtime.EVENT_JOINROOMEVENTACTION then
+			for i,nr in ipairs(data.player_nrs) do
+				if not self.players[nr] then
+					spawn_player(self, nr)
+				end
+			end
+		elseif id == realtime.EVENT_LEAVEROOMEVENTACTION then
+			delete_player(self, data.player_nr)
+		end
+	end
+end

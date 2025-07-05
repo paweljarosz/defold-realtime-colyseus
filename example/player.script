@@ -1,0 +1,173 @@
+local client = require("example.client")
+
+go.property("local_player", true)
+go.property("player_nr", 0)
+
+local ANIM_IDLE = "Idle"
+local ANIM_WALK = "Walking_A"
+
+local EVENT_POSX = 1
+local EVENT_POSY = 2
+local EVENT_POSZ = 3
+local EVENT_ROTX = 4
+local EVENT_ROTY = 5
+local EVENT_ROTZ = 6
+local EVENT_FORWARD = 7
+local EVENT_ROTATION = 8
+local EVENT_EULERY = 9
+
+local function play_animation(self, id, playback)
+	if self.animation ~= id then
+		self.animation = id
+		model.play_anim("model#model", id, playback or go.PLAYBACK_LOOP_FORWARD)
+	end
+end
+
+function init(self)
+	self.rotation = 0
+	self.forward = 0
+
+	self.animation = nil
+
+	play_animation(self, ANIM_IDLE)
+
+	-- enabled and disable meshes to get the correct look
+	-- weapons
+	model.set_mesh_enabled("model#model", "1H_Sword", true)
+	model.set_mesh_enabled("model#model", "1H_Sword_Offhand", false)
+	model.set_mesh_enabled("model#model", "2H_Sword", false)
+
+	-- equipment
+	model.set_mesh_enabled("model#model", "Knight_Helmet", false)
+	model.set_mesh_enabled("model#model", "Knight_Cape", false)
+
+	-- different shields
+	model.set_mesh_enabled("model#model", "Spike_Shield", true)
+	model.set_mesh_enabled("model#model", "Round_Shield", false)
+	model.set_mesh_enabled("model#model", "Rectangle_Shield", false)
+	model.set_mesh_enabled("model#model", "Badge_Shield", false)
+
+	if self.local_player then
+		msg.post(".", "acquire_input_focus")
+		go.set_parent("/camera", go.get_id())
+		self.timerh = timer.delay(0.1, true, function()
+			local pos = go.get_position()
+			realtime.raise_event(false, pos.x, EVENT_POSX)
+			realtime.raise_event(false, pos.y, EVENT_POSY)
+			realtime.raise_event(false, pos.z, EVENT_POSZ)
+
+			realtime.raise_event(false, go.get("model", "euler.y"), EVENT_EULERY)
+
+			realtime.raise_event(false, self.forward, EVENT_FORWARD)
+			realtime.raise_event(false, self.rotation, EVENT_ROTATION)
+		end)
+	else
+		client.subscribe(msg.url())
+	end
+end
+
+function final(self)
+	if self.local_player then
+		go.set_parent("/camera", nil, true)
+		timer.cancel(self.timerh)
+	else
+		client.unsubscribe(msg.url())
+	end
+end
+
+function update(self, dt)
+	local rot = go.get_rotation("model")
+	rot = rot * vmath.quat_rotation_y(2 * -self.rotation * dt)
+	go.set_rotation(rot, "model")
+
+	local pos = go.get_position()
+	pos = pos + vmath.rotate(rot, vmath.vector3(0, 0, 5 * dt * self.forward))
+	go.set_position(pos)
+
+	if self.forward == 0 then
+		play_animation(self, ANIM_IDLE)
+	else
+		play_animation(self, ANIM_WALK)
+	end
+end
+
+local function update_position(component, value)
+	local pos = go.get_position()
+	pos[component] = value
+	go.set_position(pos)
+end
+
+local function update_rotation(component, value)
+	local rot = go.get_rotation("model")
+	rot[component] = value
+	go.set_rotation(rot, "model")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == client.EVENT then
+		local id = message.id
+		local data = message.data
+		if data.error_code and data.error_code > 0 then
+			print(data.error_string)
+			return
+		end
+		if id == realtime.EVENT_CUSTOMEVENTACTION then
+			if self.player_nr == data.player_nr then
+				if data.event_code == EVENT_POSX then
+					update_position("x", data.event_content)
+				elseif data.event_code == EVENT_POSY then
+					update_position("y", data.event_content)
+				elseif data.event_code == EVENT_POSZ then
+					update_position("z", data.event_content)
+				elseif data.event_code == EVENT_ROTX then
+					update_rotation("x", data.event_content)
+				elseif data.event_code == EVENT_ROTY then
+					update_rotation("y", data.event_content)
+				elseif data.event_code == EVENT_ROTZ then
+					update_rotation("z", data.event_content)
+				elseif data.event_code == EVENT_EULERY then
+					go.set("model", "euler.y",  data.event_content)
+				elseif data.event_code == EVENT_FORWARD then
+					self.forward = data.event_content
+				elseif data.event_code == EVENT_ROTATION then
+					self.rotation = data.event_content
+				end
+			end
+		end
+	end
+end
+		
+
+function on_input(self, action_id, action)
+	if action_id == hash("left") then
+		if action.pressed then
+			self.rotation = -1
+		elseif action.released then
+			self.rotation = 0
+		end
+	elseif action_id == hash("right") then
+		if action.pressed then
+			self.rotation = 1
+		elseif action.released then
+			self.rotation = 0
+		end
+	elseif action_id == hash("up") then
+		if action.pressed then
+			self.forward = 1
+		elseif action.released then
+			self.forward = 0
+		end
+	elseif action_id == hash("down") then
+		if action.pressed then
+			self.forward = -1
+		elseif action.released then
+			self.forward = 0
+		end
+	end
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Learn more: https://defold.com/manuals/hot-reload/
+	-- Remove this function if not needed
+end

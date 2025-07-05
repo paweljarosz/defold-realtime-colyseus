@@ -1,0 +1,63 @@
+name: "level"
+instances {
+  id: "wall5x1"
+  prototype: "/example/props/wall5x1.go"
+  position {
+    x: 8.0
+    z: 2.0
+  }
+}
+instances {
+  id: "wall5x"
+  prototype: "/example/props/wall5x1.go"
+  position {
+    x: 8.0
+    z: -18.0
+  }
+}
+instances {
+  id: "wall5x2"
+  prototype: "/example/props/wall5x1.go"
+  position {
+    x: -2.0
+    z: -8.0
+  }
+  rotation {
+    y: 0.70710677
+    w: 0.70710677
+  }
+}
+instances {
+  id: "wall5x3"
+  prototype: "/example/props/wall5x1.go"
+  position {
+    x: 18.0
+    z: -8.0
+  }
+  rotation {
+    y: 0.70710677
+    w: 0.70710677
+  }
+}
+instances {
+  id: "floor5x5"
+  prototype: "/example/props/floor5x5.go"
+  position {
+    x: 8.0
+    z: -8.0
+  }
+}
+scale_along_z: 0
+embedded_instances {
+  id: "floor"
+  children: "floor5x5"
+  data: ""
+}
+embedded_instances {
+  id: "walls"
+  children: "wall5x"
+  children: "wall5x1"
+  children: "wall5x2"
+  children: "wall5x3"
+  data: ""
+}

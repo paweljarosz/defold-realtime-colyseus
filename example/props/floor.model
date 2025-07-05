@@ -1,0 +1,10 @@
+mesh: "/example/assets/models/dungeon/floor_tile_large.gltf.glb"
+name: "floor"
+materials {
+  name: "texture"
+  material: "/example/assets/materials/unlit.material"
+  textures {
+    sampler: "texture0"
+    texture: "/example/assets/models/dungeon/dungeon_texture.png"
+  }
+}

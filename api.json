@@ -248,7 +248,7 @@
                             "usage": null
                         },
                         {
-                            "description": "The value of the autoJoinLobby flag determines if the client will automatically join the default lobby whenever it has successfully connected and whenever it leaves a game room.",
+                            "description": "",
                             "has_params": true,
                             "has_returns": true,
                             "name": "raise_event",
@@ -282,7 +282,7 @@
                                     "type": "boolea"
                                 }
                             ],
-                            "summary": "Set the auto join lobby flag.",
+                            "summary": "Sends in-game data to other players in the game.",
                             "usage": null
                         },
                         {

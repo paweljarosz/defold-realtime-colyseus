@@ -114,7 +114,7 @@ Get room list.
 
 
 ### raise_event(reliable,parameter,event_code,options)
-Set the auto join lobby flag. The value of the autoJoinLobby flag determines if the client will automatically join the default lobby whenever it has successfully connected and whenever it leaves a game room.
+Sends in-game data to other players in the game. 
 
 
 PARAMS

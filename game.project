@@ -24,3 +24,6 @@ clear_color_red = 0.2
 clear_color_green = 0.2
 clear_color_blue = 0.2
 
+[physics]
+type = 3D
+

@@ -243,7 +243,7 @@ def check_and_process_entry(line, lines, filetype):
     return None
 
 
-def process_lines(lines, filetype):
+def process_lines(lines, filename, filetype):
     print("Processing {}".format(filename))
     entries = []
     while len(lines) > 0:
@@ -255,58 +255,61 @@ def process_lines(lines, filetype):
     return entries
 
 
-groups_lookup = {}
+def generate(directory):
+    groups_lookup = {}
 
-directory = "realtime"
+    for filetype in ["lua", "cpp"]:
 
-for filetype in ["lua", "cpp"]:
+        pattern = "*." + filetype
+        files = find_files(directory, pattern)
+        for filename in files:
+            with open(filename, encoding='utf-8', errors='ignore') as f:
+                lines = f.readlines()
+                file_description = None
+                first_line = lines.pop(0).strip()
+                file_description = check_and_process_entry(first_line, lines, filetype)
+                if not file_description:
+                    file_description = {}
+                else:
+                    file_description["file_summary"] = file_description["summary"]
+                    file_description["file_description"] = file_description["description"]
+                    file_description["summary"] = None
+                    file_description["description"] = None
+                
+                file_entries = process_lines(lines, filename, filetype)
+                if file_entries:
+                    # components, events, info etc
+                    if "group" not in file_description:
+                        group_name = os.path.dirname(filename).replace(directory + "/", "")
+                        file_description["group"] = group_name
+                    if "module" not in file_description:
+                        module = os.path.basename(filename).replace("." + filetype, "")
+                        file_description["module"] = module
+                    file_description["entries"] = file_entries
+                    file_description["filename"] = filename
 
-    pattern = "*." + filetype
-    files = find_files(directory, pattern)
-    for filename in files:
-        with open(filename, encoding='utf-8', errors='ignore') as f:
-            lines = f.readlines()
-            file_description = None
-            first_line = lines.pop(0).strip()
-            file_description = check_and_process_entry(first_line, lines, filetype)
-            if not file_description:
-                file_description = {}
-            else:
-                file_description["file_summary"] = file_description["summary"]
-                file_description["file_description"] = file_description["description"]
-                file_description["summary"] = None
-                file_description["description"] = None
-            
-            file_entries = process_lines(lines, filetype)
-            if file_entries:
-                # components, events, info etc
-                if "group" not in file_description:
-                    group_name = os.path.dirname(filename).replace(directory + "/", "")
-                    file_description["group"] = group_name
-                if "module" not in file_description:
-                    module = os.path.basename(filename).replace("." + filetype, "")
-                    file_description["module"] = module
-                file_description["entries"] = file_entries
-                file_description["filename"] = filename
+                    group_name = file_description["group"]
+                    if group_name not in groups_lookup:
+                        groups_lookup[group_name] = {
+                            "group": group_name,
+                            "files": []
+                        }
+                    groups_lookup[group_name]["files"].append(file_description)
 
-                group_name = file_description["group"]
-                if group_name not in groups_lookup:
-                    groups_lookup[group_name] = {
-                        "group": group_name,
-                        "files": []
-                    }
-                groups_lookup[group_name]["files"].append(file_description)
+    groups = []
+    for group_name in groups_lookup.keys():
+        group = groups_lookup.get(group_name)
+        groups.append(group)
 
 
-groups = []
-for group_name in groups_lookup.keys():
-    group = groups_lookup.get(group_name)
-    groups.append(group)
+script_dir = os.path.dirname(__file__)
+extension_dir = "realtime"
 
+groups = generate(extension_dir)
 
 api = { "groups": groups }
-with open("api.json", "w", encoding='utf-8') as f:
+with open(os.path.join("build", "api.json"), "w", encoding='utf-8') as f:
     json.dump(api, f, indent=4, sort_keys=True)
 
-render(api, "api_markdown.mtl", "api.md")
-render(api, "api_script.mtl", os.path.join(directory, "api", directory + ".script_api"))
+render(api, os.path.join(script_dir, "api_markdown.mtl"), os.path.join("build", "api.md"))
+render(api, os.path.join(script_dir, "api_script.mtl"), os.path.join(extension_dir, "api", extension_dir + ".script_api"))

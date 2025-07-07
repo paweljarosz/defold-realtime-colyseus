@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/Steamworks_SDK-1.58a-green)
+![](https://img.shields.io/badge/Realtime-5.0.12-green)
 
 # Photon Realtime Extension for Defold
 

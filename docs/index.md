@@ -5,9 +5,7 @@ brief: This manual covers how to integrate a game with the Photon Realtime SDK.
 
 # Defold Photon Realtime extension API documentation
 
-The Photon Realtime SDK provides the necessary functionality to create multiplayer games and higher-level network solutions. It solves problems like authentication, matchmaking and fast communication with a scalable approach.
-
-This extension provides an interface to integrate a Defold game with the Photon Realtime SDK.
+The Photon Realtime provides functionality to create multiplayer games and higher-level network solutions using the Photon Realtime SDK. It solves problems like authentication, matchmaking and fast communication with a scalable approach. This extension provides a Lua interface to integrate a Defold game with the Photon Realtime services.
 
 
 ## Installation
@@ -21,16 +19,16 @@ Select `Project->Fetch Libraries` once you have added the version to `game.proje
 
 ## Usage
 
+The Photon Realtime SDK is based around the concept of `Operations`, `Operation Responses` and `Events`. Clients call `Operations` on the server side and get `Operation Responses` for most of those. Aside from `Operation Responses`, clients also receive `Events`, which are used independently of what the client asked for.
+
+While in a room, the operation `RaiseEvent` is used to pass data to the others, which receive a custom event.
+
+Make sure to read the [official Photon Realtime documentation](https://doc.photonengine.com/realtime/current/getting-started/realtime-intro) to learn more about the various ways Photon Realtime can be used to create multiplayer games.
+
+
 ```lua
 local EVENT_POSX = 1
 local EVENT_POSY = 2
-
--- use realtime.raise_event to send a game specific event
-local function send_position(self)
-	local pos = go.get_position()
-	realtime.raise_event(false, pos.x, EVENT_POSX)
-	realtime.raise_event(false, pos.y, EVENT_POSY)
-end
 
 function init(self)
 	-- initialize realtime
@@ -42,11 +40,19 @@ function init(self)
 			return
 		end
 
-		-- check events, some examples below
+		-- check responses and events, some examples below
 		if id == realtime.EVENT_CONNECTRETURN then
 			print("connected!")
+
+			-- join or create a random room
+			realtime.join_or_create_random_room(game_id, room_options, join_options)
 		elseif id == realtime.EVENT_JOINRANDOMORCREATEROOMRETURN then
 			print(data.local_player_nr)
+
+			-- raise a custom event with position data
+			local pos = go.get_position()
+			realtime.raise_event(false, pos.x, EVENT_POSX)
+			realtime.raise_event(false, pos.y, EVENT_POSY)
 		elseif message_id == realtime.EVENT_CUSTOMEVENTACTION then
 			-- custom events sent using realtime.raise_event() end up here
 			if data.event_code == EVENT_POSX then
@@ -70,6 +76,8 @@ end
 ## Example
 
 [Refer to the example project](https://github.com/defold/extension-photon-realtime/blob/master/examples) to see a complete example of how the integration works.
+
+![](example_480p.mov)
 
 
 ## Source code

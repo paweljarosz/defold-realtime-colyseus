@@ -301,6 +301,8 @@ def generate(directory):
         group = groups_lookup.get(group_name)
         groups.append(group)
 
+    return groups
+
 
 script_dir = os.path.dirname(__file__)
 extension_dir = "realtime"

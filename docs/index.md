@@ -1,11 +1,11 @@
 ---
-title: Photon Realtime extension API documentation
+title: Photon Realtime
 brief: This manual covers how to integrate a game with the Photon Realtime SDK.
 ---
 
 # Defold Photon Realtime extension API documentation
 
-The Photon Realtime provides functionality to create multiplayer games and higher-level network solutions using the Photon Realtime SDK. It solves problems like authentication, matchmaking and fast communication with a scalable approach. This extension provides a Lua interface to integrate a Defold game with the Photon Realtime services.
+Photon Realtime offers powerful tools for creating multiplayer games and advanced networked experiences through the Photon Realtime SDK. It provides scalable solutions for essential features such as authentication, matchmaking, and fast, reliable communication. This extension adds a Lua interface, enabling seamless integration of Photon Realtime services into your Defold game.
 
 
 ## Installation
@@ -71,6 +71,11 @@ function update(self, dt)
 end
 
 ```
+
+
+## License
+
+You must read and agree to the [Exit Games End User License Terms](https://github.com/defold/extension-photon-realtime/blob/master/realtime/license.txt) before using Photon Realtime in your own project.
 
 
 ## Example

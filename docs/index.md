@@ -77,7 +77,7 @@ end
 
 [Refer to the example project](https://github.com/defold/extension-photon-realtime/blob/master/examples) to see a complete example of how the integration works.
 
-![](https://youtu.be/G5w62I-I2hA)
+[![Watch the video](https://img.youtube.com/vi/G5w62I-I2hA/default.jpg)](https://youtu.be/G5w62I-I2hA)
 
 
 ## Source code

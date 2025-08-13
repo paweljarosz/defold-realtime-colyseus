@@ -77,7 +77,7 @@ end
 
 [Refer to the example project](https://github.com/defold/extension-photon-realtime/blob/master/examples) to see a complete example of how the integration works.
 
-![](example_480p.mov)
+![](https://youtu.be/G5w62I-I2hA)
 
 
 ## Source code

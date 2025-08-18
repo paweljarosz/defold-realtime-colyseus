@@ -1,3 +1,9 @@
+/** Photon Realtime
+ * Functions and constants for interacting with Photon Realtime
+ * @document
+ * @namespace realtime
+ */
+
 #define EXTENSION_NAME Realtime
 #define LIB_NAME "Realtime"
 #define MODULE_NAME "realtime"
@@ -13,8 +19,6 @@
 #include "LoadBalancing-cpp/inc/Client.h"
 #include "listener.h"
 #include "helper.h"
-
-
 
 
 static ExitGames::LoadBalancing::Client* g_PhotonClient;
@@ -315,15 +319,15 @@ static int Init(lua_State* L)
 
 /** Connect to the server.
  * @name connect
- * @param options Table with connection options
- *   - username
- *   - use_datagram_encryption
- *   - server_type See SERVER_TYPE_* enums
- *   - server_address The IP address or domain name and optionally the port number to connect to. IP addresses can be in IPv4 or IPv6 format
- *   - auth_data Sets the HTTP POST data, that will be forwarded to the authentication service, to the provided data.
- *   - auth_parameters The HTTP GET parameters that will be forwarded to the authentication service to the provided parameters.
- *   - auth_type The type of the "Custom Authentication" service that will be used. See AUTH_* enums
- * @param callback
+ * @table options Table with connection options
+ * @field username string
+ * @field use_datagram_encryption boolean
+ * @field server_type number See SERVER_TYPE_* enums
+ * @field server_address string The IP address or domain name and optionally the port number to connect to. IP addresses can be in IPv4 or IPv6 format
+ * @field auth_data string Sets the HTTP POST data, that will be forwarded to the authentication service, to the provided data.
+ * @field auth_parameters string The HTTP GET parameters that will be forwarded to the authentication service to the provided parameters.
+ * @field auth_type number The type of the "Custom Authentication" service that will be used. See AUTH_* enums
+ * @function callback
  */
 static int Connect(lua_State* L)
 {
@@ -449,6 +453,18 @@ static int LeaveLobby(lua_State* L)
  * @name create_room
  * @string game_id The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
  * @table room_options
+ * @field is_visible boolean
+ * @field is_open boolean
+ * @field supress_room_events boolean
+ * @field max_players number
+ * @field player_ttl number
+ * @field empty_room_ttl number
+ * @field lobby_type number realtime.LOBBYTYPE_* enum
+ * @field lobby_name string
+ * @field publish_user_id string
+ * @field direct_mode numbmer realtime.DIRECTMODE_* enum
+ * @field props_listed_in_lobby table
+ * @field custom_room_properties table
  * @table expected_users
  * 
  * @example
@@ -493,6 +509,9 @@ static int CreateRoom(lua_State* L)
  * @name join_room
  * @string game_id The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
  * @table join_options
+ * @field rejoin boolean
+ * @field cache_slice_index number
+ * @field expected_users table
  * 
  * @example
  *   local game_id = "1234"
@@ -524,7 +543,26 @@ static int JoinRoom(lua_State* L)
  * @name join_or_create_room
  * @string game_id The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
  * @table room_options
+ * @field is_visible boolean
+ * @field is_open boolean
+ * @field supress_room_events boolean
+ * @field max_players number
+ * @field player_ttl number
+ * @field empty_room_ttl number
+ * @field lobby_type number realtime.LOBBYTYPE_* enum
+ * @field lobby_name string
+ * @field publish_user_id string
+ * @field direct_mode numbmer realtime.DIRECTMODE_* enum
+ * @field props_listed_in_lobby table
+ * @field custom_room_properties table
  * @table join_options
+ * @field custom_room_properties table
+ * @field max_players number
+ * @field matchmaking_mode number realtime.MATCHMAKINGMODE_* enum
+ * @field lobby_name string
+ * @field lobby_type number realtime.LOBBYTYPE_* enum
+ * @field sql_lobby_filter string
+ * @field expected_users table
  * 
  * @example
  *   local game_id = "1234"
@@ -581,7 +619,26 @@ static int JoinOrCreateRoom(lua_State* L)
  * @name join_or_create_random_room
  * @string game_id The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
  * @table room_options
+ * @field is_visible boolean
+ * @field is_open boolean
+ * @field supress_room_events boolean
+ * @field max_players number
+ * @field player_ttl number
+ * @field empty_room_ttl number
+ * @field lobby_type number realtime.LOBBYTYPE_* enum
+ * @field lobby_name string
+ * @field publish_user_id string
+ * @field direct_mode numbmer realtime.DIRECTMODE_* enum
+ * @field props_listed_in_lobby table
+ * @field custom_room_properties table
  * @table join_options
+ * @field custom_room_properties table
+ * @field max_players number
+ * @field matchmaking_mode number realtime.MATCHMAKINGMODE_* enum
+ * @field lobby_name string
+ * @field lobby_type number realtime.LOBBYTYPE_* enum
+ * @field sql_lobby_filter string
+ * @field expected_users table
  * 
  * @example
  *   local game_id = "1234"
@@ -636,7 +693,15 @@ static int JoinOrCreateRandomRoom(lua_State* L)
 
 
 /** Join random room.
+ * @name join_random_room
  * @table join_options
+ * @field custom_room_properties table
+ * @field max_players number
+ * @field matchmaking_mode number realtime.MATCHMAKINGMODE_* enum
+ * @field lobby_name string
+ * @field lobby_type number realtime.LOBBYTYPE_* enum
+ * @field sql_lobby_filter string
+ * @field expected_users table
  * 
  * @example
  *   local join_options = {
@@ -716,6 +781,14 @@ static int GetRoomList(lua_State* L)
  * @number parameter
  * @number event_code
  * @table options (channel_id, event_caching, receiver_group, interest_group, cache_slice_index, target_players, web_flags, encrypt)
+ * @field channel_id number
+ * @field event_caching number
+ * @field receiver_group number
+ * @field interest_group number
+ * @field cache_slice_index number
+ * @field target_players number
+ * @field web_flags number
+ * @field encrypt boolean
  * @treturn boolean 
  */
 static int RaiseEvent(lua_State* L)

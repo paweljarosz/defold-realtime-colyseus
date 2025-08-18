@@ -10,17 +10,34 @@
     - name: app_id
       type: string
 
-
   - name: connect
     type: function
-    desc: Connect to the server. - username - use_datagram_encryption - server_type See SERVER_TYPE_* enums - server_address The IP address or domain name and optionally the port number to connect to. IP addresses can be in IPv4 or IPv6 format - auth_data Sets the HTTP POST data, that will be forwarded to the authentication service, to the provided data. - auth_parameters The HTTP GET parameters that will be forwarded to the authentication service to the provided parameters. - auth_type The type of the &quot;Custom Authentication&quot; service that will be used. See AUTH_* enums
+    desc: Connect to the server. 
     parameters:
     - name: options
-      type: None
+      type: table
       desc: Table with connection options
+      - name: username
+        type: string
+      - name: use_datagram_encryption
+        type: boolean
+      - name: server_type
+        type: number
+        desc: See SERVER_TYPE_* enums
+      - name: server_address
+        type: string
+        desc: The IP address or domain name and optionally the port number to connect to. IP addresses can be in IPv4 or IPv6 format
+      - name: auth_data
+        type: string
+        desc: Sets the HTTP POST data, that will be forwarded to the authentication service, to the provided data.
+      - name: auth_parameters
+        type: string
+        desc: The HTTP GET parameters that will be forwarded to the authentication service to the provided parameters.
+      - name: auth_type
+        type: number
+        desc: The type of the &quot;Custom Authentication&quot; service that will be used. See AUTH_* enums
     - name: callback
-      type: None
-
+      type: function
 
   - name: update
     type: function
@@ -36,10 +53,8 @@
     parameters:
     - name: lobby_name
       type: string
-
     - name: lobby_type
       type: number
-
 
   - name: leave_lobby
     type: function
@@ -47,64 +62,188 @@
 
   - name: create_room
     type: function
-    desc: Create room. Local game_id = &quot;1234&quot; local room_options = { is_visible = false, is_open = false, supress_room_events = false, max_players = 4, player_ttl = 0, empty_room_ttl = 0, lobby_type = realtime.LOBBYTYPE_DEFAULT, lobby_name = &quot;&quot;, publish_user_id = &quot;&quot;, direct_mode = realtime.DIRECTMODE_NONE, props_listed_in_lobby = {}, custom_room_properties = {}, } local expected_users = {} realtime.create_room(game_id, room_options, expected_users)
+    desc: Create room. 
     parameters:
     - name: game_id
       type: string
       desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
     - name: room_options
       type: table
-
+      - name: is_visible
+        type: boolean
+      - name: is_open
+        type: boolean
+      - name: supress_room_events
+        type: boolean
+      - name: max_players
+        type: number
+      - name: player_ttl
+        type: number
+      - name: empty_room_ttl
+        type: number
+      - name: lobby_type
+        type: number
+        desc: Realtime.LOBBYTYPE_* enum
+      - name: lobby_name
+        type: string
+      - name: publish_user_id
+        type: string
+      - name: direct_mode
+        type: numbmer
+        desc: Realtime.DIRECTMODE_* enum
+      - name: props_listed_in_lobby
+        type: table
+      - name: custom_room_properties
+        type: table
     - name: expected_users
       type: table
 
-
   - name: join_room
     type: function
-    desc: Join room. Local game_id = &quot;1234&quot; local join_options = { rejoin = false, cache_slice_index = 0, expected_users = {}, } realtime.join_room(game_id, join_options)
+    desc: Join room. 
     parameters:
     - name: game_id
       type: string
       desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
     - name: join_options
       type: table
-
+      - name: rejoin
+        type: boolean
+      - name: cache_slice_index
+        type: number
+      - name: expected_users
+        type: table
 
   - name: join_or_create_room
     type: function
-    desc: Join or create room. Local game_id = &quot;1234&quot; local room_options = { is_visible = false, is_open = false, supress_room_events = false, max_players = 4, player_ttl = 0, empty_room_ttl = 0, lobby_type = realtime.LOBBYTYPE_DEFAULT, lobby_name = &quot;&quot;, publish_user_id = &quot;&quot;, direct_mode = realtime.DIRECTMODE_NONE, props_listed_in_lobby = {}, custom_room_properties = {}, } local join_options = { custom_room_properties = {}, max_players = 0, matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM, lobby_name = &quot;&quot;, lobby_type = realtime.LOBBYTYPE_DEFAULT, sql_lobby_filter = &quot;&quot;, expected_users = {}, }
+    desc: Join or create room. 
     parameters:
     - name: game_id
       type: string
       desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
     - name: room_options
       type: table
-
+      - name: is_visible
+        type: boolean
+      - name: is_open
+        type: boolean
+      - name: supress_room_events
+        type: boolean
+      - name: max_players
+        type: number
+      - name: player_ttl
+        type: number
+      - name: empty_room_ttl
+        type: number
+      - name: lobby_type
+        type: number
+        desc: Realtime.LOBBYTYPE_* enum
+      - name: lobby_name
+        type: string
+      - name: publish_user_id
+        type: string
+      - name: direct_mode
+        type: numbmer
+        desc: Realtime.DIRECTMODE_* enum
+      - name: props_listed_in_lobby
+        type: table
+      - name: custom_room_properties
+        type: table
     - name: join_options
       type: table
-
+      - name: custom_room_properties
+        type: table
+      - name: max_players
+        type: number
+      - name: matchmaking_mode
+        type: number
+        desc: Realtime.MATCHMAKINGMODE_* enum
+      - name: lobby_name
+        type: string
+      - name: lobby_type
+        type: number
+        desc: Realtime.LOBBYTYPE_* enum
+      - name: sql_lobby_filter
+        type: string
+      - name: expected_users
+        type: table
 
   - name: join_or_create_random_room
     type: function
-    desc: Join or create random room. Local game_id = &quot;1234&quot; local room_options = { is_visible = false, is_open = false, supress_room_events = false, max_players = 4, player_ttl = 0, empty_room_ttl = 0, lobby_type = realtime.LOBBYTYPE_DEFAULT, lobby_name = &quot;&quot;, publish_user_id = &quot;&quot;, direct_mode = realtime.DIRECTMODE_NONE, props_listed_in_lobby = {}, custom_room_properties = {}, } local join_options = { custom_room_properties = {}, max_players = 0, matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM, lobby_name = &quot;&quot;, lobby_type = realtime.LOBBYTYPE_DEFAULT, sql_lobby_filter = &quot;&quot;, expected_users = {}, } realtime.join_or_create_random_room(game_id, room_options, join_options)
+    desc: Join or create random room. 
     parameters:
     - name: game_id
       type: string
       desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
     - name: room_options
       type: table
-
+      - name: is_visible
+        type: boolean
+      - name: is_open
+        type: boolean
+      - name: supress_room_events
+        type: boolean
+      - name: max_players
+        type: number
+      - name: player_ttl
+        type: number
+      - name: empty_room_ttl
+        type: number
+      - name: lobby_type
+        type: number
+        desc: Realtime.LOBBYTYPE_* enum
+      - name: lobby_name
+        type: string
+      - name: publish_user_id
+        type: string
+      - name: direct_mode
+        type: numbmer
+        desc: Realtime.DIRECTMODE_* enum
+      - name: props_listed_in_lobby
+        type: table
+      - name: custom_room_properties
+        type: table
     - name: join_options
       type: table
+      - name: custom_room_properties
+        type: table
+      - name: max_players
+        type: number
+      - name: matchmaking_mode
+        type: number
+        desc: Realtime.MATCHMAKINGMODE_* enum
+      - name: lobby_name
+        type: string
+      - name: lobby_type
+        type: number
+        desc: Realtime.LOBBYTYPE_* enum
+      - name: sql_lobby_filter
+        type: string
+      - name: expected_users
+        type: table
 
-
-  - name: int JoinRandomRoom
+  - name: join_random_room
     type: function
-    desc: Join random room. Local join_options = { custom_room_properties = {}, max_players = 0, matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM, lobby_name = &quot;&quot;, lobby_type = realtime.LOBBYTYPE_DEFAULT, sql_lobby_filter = &quot;&quot;, expected_users = {}, } realtime.join_random_room(join_options)
+    desc: Join random room. 
     parameters:
     - name: join_options
       type: table
-
+      - name: custom_room_properties
+        type: table
+      - name: max_players
+        type: number
+      - name: matchmaking_mode
+        type: number
+        desc: Realtime.MATCHMAKINGMODE_* enum
+      - name: lobby_name
+        type: string
+      - name: lobby_type
+        type: number
+        desc: Realtime.LOBBYTYPE_* enum
+      - name: sql_lobby_filter
+        type: string
+      - name: expected_users
+        type: table
 
   - name: leave_room
     type: function
@@ -112,10 +251,8 @@
     parameters:
     - name: will_come_back
       type: boolean
-
     - name: send_auth_cookie
       type: boolean
-
 
   - name: get_room_list
     type: function
@@ -127,16 +264,29 @@
     parameters:
     - name: reliable
       type: boolean
-
     - name: parameter
       type: number
-
     - name: event_code
       type: number
-
     - name: options
       type: table
       desc: (channel_id, event_caching, receiver_group, interest_group, cache_slice_index, target_players, web_flags, encrypt)
+      - name: channel_id
+        type: number
+      - name: event_caching
+        type: number
+      - name: receiver_group
+        type: number
+      - name: interest_group
+        type: number
+      - name: cache_slice_index
+        type: number
+      - name: target_players
+        type: number
+      - name: web_flags
+        type: number
+      - name: encrypt
+        type: boolean
     returns:
     - name: n
       type: boolea
@@ -148,7 +298,6 @@
     parameters:
     - name: auto_join
       type: boolean
-
 
   - name: EVENT_CONNECTIONERRORRETURN
     type: number

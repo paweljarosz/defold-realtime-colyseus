@@ -17,6 +17,7 @@
     - name: options
       type: table
       desc: Table with connection options
+      fields:
       - name: username
         type: string
       - name: use_datagram_encryption
@@ -38,6 +39,7 @@
         desc: The type of the &quot;Custom Authentication&quot; service that will be used. See AUTH_* enums
     - name: callback
       type: function
+      fields:
 
   - name: update
     type: function
@@ -105,8 +107,10 @@
     - name: game_id
       type: string
       desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
+      fields:
     - name: join_options
       type: table
+      fields:
       - name: rejoin
         type: boolean
       - name: cache_slice_index
@@ -121,8 +125,10 @@
     - name: game_id
       type: string
       desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
+      fields:
     - name: room_options
       type: table
+      fields:
       - name: is_visible
         type: boolean
       - name: is_open
@@ -151,6 +157,7 @@
         type: table
     - name: join_options
       type: table
+      fields:
       - name: custom_room_properties
         type: table
       - name: max_players
@@ -175,8 +182,10 @@
     - name: game_id
       type: string
       desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
+      fields:
     - name: room_options
       type: table
+      fields:
       - name: is_visible
         type: boolean
       - name: is_open
@@ -205,6 +214,7 @@
         type: table
     - name: join_options
       type: table
+      fields:
       - name: custom_room_properties
         type: table
       - name: max_players
@@ -228,6 +238,7 @@
     parameters:
     - name: join_options
       type: table
+      fields:
       - name: custom_room_properties
         type: table
       - name: max_players
@@ -264,13 +275,17 @@
     parameters:
     - name: reliable
       type: boolean
+      fields:
     - name: parameter
       type: number
+      fields:
     - name: event_code
       type: number
+      fields:
     - name: options
       type: table
       desc: (channel_id, event_caching, receiver_group, interest_group, cache_slice_index, target_players, web_flags, encrypt)
+      fields:
       - name: channel_id
         type: number
       - name: event_caching

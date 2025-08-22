@@ -291,6 +291,8 @@ static void check_raiseeventoptions(lua_State* L, int index, ExitGames::LoadBala
 /** Initialize Realtime by creating a load balanced client
  * @name init
  * @string app_id
+ * @string app_version
+ * @function listener
  */
 static int Init(lua_State* L)
 {

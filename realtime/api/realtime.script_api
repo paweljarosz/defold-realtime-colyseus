@@ -9,6 +9,10 @@
     parameters:
     - name: app_id
       type: string
+    - name: app_version
+      type: string
+    - name: listener
+      type: function
 
   - name: connect
     type: function

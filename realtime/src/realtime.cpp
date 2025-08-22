@@ -530,7 +530,7 @@ static int JoinRoom(lua_State* L)
 
     const char* gameID = luaL_checkstring(L, 1);
     JoinRoomOptions joinRoomOptions = JoinRoomOptions();
-    check_joinroomoptions(L, 3, &joinRoomOptions);
+    check_joinroomoptions(L, 2, &joinRoomOptions);
             
     g_PhotonClient->opJoinRoom(
         gameID,

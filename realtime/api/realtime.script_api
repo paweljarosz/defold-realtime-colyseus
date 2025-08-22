@@ -41,8 +41,6 @@
       - name: auth_type
         type: number
         desc: The type of the &quot;Custom Authentication&quot; service that will be used. See AUTH_* enums
-    - name: callback
-      type: function
 
   - name: update
     type: function

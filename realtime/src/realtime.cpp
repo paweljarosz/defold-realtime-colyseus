@@ -329,7 +329,6 @@ static int Init(lua_State* L)
  * @field auth_data string Sets the HTTP POST data, that will be forwarded to the authentication service, to the provided data.
  * @field auth_parameters string The HTTP GET parameters that will be forwarded to the authentication service to the provided parameters.
  * @field auth_type number The type of the "Custom Authentication" service that will be used. See AUTH_* enums
- * @function callback
  */
 static int Connect(lua_State* L)
 {

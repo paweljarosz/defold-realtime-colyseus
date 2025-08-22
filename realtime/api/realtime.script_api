@@ -39,7 +39,6 @@
         desc: The type of the &quot;Custom Authentication&quot; service that will be used. See AUTH_* enums
     - name: callback
       type: function
-      fields:
 
   - name: update
     type: function
@@ -68,9 +67,28 @@
     parameters:
     - name: game_id
       type: string
-      desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
+      desc: The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local expected_users = {}
+         realtime.create_room(game_id, room_options, expected_users)
     - name: room_options
       type: table
+      fields:
       - name: is_visible
         type: boolean
       - name: is_open
@@ -97,8 +115,44 @@
         type: table
       - name: custom_room_properties
         type: table
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local expected_users = {}
+         realtime.create_room(game_id, room_options, expected_users)
     - name: expected_users
       type: table
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local expected_users = {}
+         realtime.create_room(game_id, room_options, expected_users)
 
   - name: join_room
     type: function
@@ -106,8 +160,15 @@
     parameters:
     - name: game_id
       type: string
-      desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
-      fields:
+      desc: The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
+      example: |
+         local game_id = "1234"
+         local join_options = {
+            rejoin = false,
+            cache_slice_index = 0,
+            expected_users = {},
+         }
+         realtime.join_room(game_id, join_options)
     - name: join_options
       type: table
       fields:
@@ -117,6 +178,14 @@
         type: number
       - name: expected_users
         type: table
+      example: |
+         local game_id = "1234"
+         local join_options = {
+            rejoin = false,
+            cache_slice_index = 0,
+            expected_users = {},
+         }
+         realtime.join_room(game_id, join_options)
 
   - name: join_or_create_room
     type: function
@@ -124,8 +193,32 @@
     parameters:
     - name: game_id
       type: string
-      desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
-      fields:
+      desc: The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local join_options = {
+            custom_room_properties = {},
+            max_players = 0,
+            matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM,
+            lobby_name = "",
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            sql_lobby_filter = "",
+            expected_users = {},
+         }
     - name: room_options
       type: table
       fields:
@@ -155,6 +248,31 @@
         type: table
       - name: custom_room_properties
         type: table
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local join_options = {
+            custom_room_properties = {},
+            max_players = 0,
+            matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM,
+            lobby_name = "",
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            sql_lobby_filter = "",
+            expected_users = {},
+         }
     - name: join_options
       type: table
       fields:
@@ -174,6 +292,31 @@
         type: string
       - name: expected_users
         type: table
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local join_options = {
+            custom_room_properties = {},
+            max_players = 0,
+            matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM,
+            lobby_name = "",
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            sql_lobby_filter = "",
+            expected_users = {},
+         }
 
   - name: join_or_create_random_room
     type: function
@@ -181,8 +324,33 @@
     parameters:
     - name: game_id
       type: string
-      desc: The name to create a room with. Must be unique and not in use or the room can&#x27;t be created. If this is an empty string, then the server will assign a GUID as name.
-      fields:
+      desc: The name to create a room with. Must be unique and not in use or the room can't be created. If this is an empty string, then the server will assign a GUID as name.
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local join_options = {
+            custom_room_properties = {},
+            max_players = 0,
+            matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM,
+            lobby_name = "",
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            sql_lobby_filter = "",
+            expected_users = {},
+         }
+         realtime.join_or_create_random_room(game_id, room_options, join_options)
     - name: room_options
       type: table
       fields:
@@ -212,6 +380,32 @@
         type: table
       - name: custom_room_properties
         type: table
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local join_options = {
+            custom_room_properties = {},
+            max_players = 0,
+            matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM,
+            lobby_name = "",
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            sql_lobby_filter = "",
+            expected_users = {},
+         }
+         realtime.join_or_create_random_room(game_id, room_options, join_options)
     - name: join_options
       type: table
       fields:
@@ -231,6 +425,32 @@
         type: string
       - name: expected_users
         type: table
+      example: |
+         local game_id = "1234"
+         local room_options = {
+            is_visible = false,
+            is_open = false,
+            supress_room_events = false,
+            max_players = 4,
+            player_ttl = 0,
+            empty_room_ttl = 0,
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            lobby_name = "",
+            publish_user_id = "",
+            direct_mode = realtime.DIRECTMODE_NONE,
+            props_listed_in_lobby = {},
+            custom_room_properties = {},
+         }
+         local join_options = {
+            custom_room_properties = {},
+            max_players = 0,
+            matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM,
+            lobby_name = "",
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            sql_lobby_filter = "",
+            expected_users = {},
+         }
+         realtime.join_or_create_random_room(game_id, room_options, join_options)
 
   - name: join_random_room
     type: function
@@ -255,6 +475,17 @@
         type: string
       - name: expected_users
         type: table
+      example: |
+         local join_options = {
+            custom_room_properties = {},
+            max_players = 0,
+            matchmaking_mode = realtime.MATCHMAKINGMODE_FILL_ROOM,
+            lobby_name = "",
+            lobby_type = realtime.LOBBYTYPE_DEFAULT,
+            sql_lobby_filter = "",
+            expected_users = {},
+         }
+         realtime.join_random_room(join_options)
 
   - name: leave_room
     type: function
@@ -275,13 +506,10 @@
     parameters:
     - name: reliable
       type: boolean
-      fields:
     - name: parameter
       type: number
-      fields:
     - name: event_code
       type: number
-      fields:
     - name: options
       type: table
       desc: (channel_id, event_caching, receiver_group, interest_group, cache_slice_index, target_players, web_flags, encrypt)
@@ -305,7 +533,6 @@
     returns:
     - name: n
       type: boolea
-
 
   - name: set_auto_join_lobby
     type: function
@@ -460,19 +687,19 @@
 
   - name: AUTH_STEAM
     type: number
-    desc: Authenticates users by their Steam Account. Pass L&quot;ticket=[ticket]&quot; to setParameters().
+    desc: Authenticates users by their Steam Account. Pass L"ticket=[ticket]" to setParameters().
 
   - name: AUTH_FACEBOOK
     type: number
-    desc: Authenticates users by their Facebook Account. Pass L&quot;token=[token]&quot; to setParameters().
+    desc: Authenticates users by their Facebook Account. Pass L"token=[token]" to setParameters().
 
   - name: AUTH_OCULUS
     type: number
-    desc: Authenticates users by their Oculus Account. Pass L&quot;userid=[userid]&amp;nonce=[nonce]&quot; to setParameters().
+    desc: Authenticates users by their Oculus Account. Pass L"userid=[userid]&nonce=[nonce]" to setParameters().
 
   - name: AUTH_PLAYSTATION_4
     type: number
-    desc: Authenticates users by their PSN Account. Pass L&quot;token=[token]&amp;env=[env]&amp;userName=[userName]&quot; to setParameters().
+    desc: Authenticates users by their PSN Account. Pass L"token=[token]&env=[env]&userName=[userName]" to setParameters().
 
   - name: AUTH_XBOX
     type: number
@@ -480,23 +707,23 @@
 
   - name: AUTH_VIVEPORT
     type: number
-    desc: Authenticates users by their HTC Viveport Account and user token. Pass L&quot;userToken=[userToken]&quot; to setParameters().
+    desc: Authenticates users by their HTC Viveport Account and user token. Pass L"userToken=[userToken]" to setParameters().
 
   - name: AUTH_NINTENDO_SWITCH
     type: number
-    desc: Authenticates users by their Nintendo Account. Pass L&quot;token=[token]&amp;appversion=[appversion]&quot; to setParameters(). The appversion is optional.
+    desc: Authenticates users by their Nintendo Account. Pass L"token=[token]&appversion=[appversion]" to setParameters(). The appversion is optional.
 
   - name: AUTH_PLAYSTATION_5
     type: number
-    desc: Authenticates users by their PSN Account. Pass L&quot;token=[token]&amp;env=[env]&amp;userName=[userName]&quot; to setParameters().
+    desc: Authenticates users by their PSN Account. Pass L"token=[token]&env=[env]&userName=[userName]" to setParameters().
 
   - name: AUTH_EPIC
     type: number
-    desc: Authenticates users by their Epic Online Services (EOS) Account. Pass L&quot;token=[token]&amp;ownershipToken=[ownershipToken]&quot; to setParameters(). The ownershipToken is optional.
+    desc: Authenticates users by their Epic Online Services (EOS) Account. Pass L"token=[token]&ownershipToken=[ownershipToken]" to setParameters(). The ownershipToken is optional.
 
   - name: AUTH_FACEBOOK_GAMING
     type: number
-    desc: Authenticates users by their Facebook Account. Pass L&quot;token=[token]&quot; to setParameters().
+    desc: Authenticates users by their Facebook Account. Pass L"token=[token]" to setParameters().
 
   - name: AUTH_NONE
     type: number
@@ -512,7 +739,7 @@
 
   - name: MATCHMAKINGMODE_FILL_ROOM
     type: number
-    desc: Fills up rooms (oldest first) to get players together as fast as possible. Default. Makes most sense with MaxPlayers &gt; 0 and games that can only start with more players.
+    desc: Fills up rooms (oldest first) to get players together as fast as possible. Default. Makes most sense with MaxPlayers > 0 and games that can only start with more players.
 
   - name: MATCHMAKINGMODE_SERIAL_MATCHING
     type: number
@@ -528,7 +755,7 @@
 
   - name: LOBBYTYPE_SQL_LOBBY
     type: number
-    desc: This lobby type lists rooms like type DEFAULT but  SQL-like &quot;where&quot; clauses for filtering can be used with Client::opJoinRandomRoom(). This allows &#x27;bigger&#x27;, &#x27;less&#x27;, &#x27;or&#x27; and &#x27;and&#x27; combinations.
+    desc: This lobby type lists rooms like type DEFAULT but  SQL-like "where" clauses for filtering can be used with Client::opJoinRandomRoom(). This allows 'bigger', 'less', 'or' and 'and' combinations.
 
   - name: LOBBYTYPE_ASYNC_RANDOM_LOBBY
     type: number

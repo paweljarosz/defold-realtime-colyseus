@@ -13,17 +13,11 @@ local ANIM_WALK = "Walking_A"
 local ANIM_ATTACK = "1H_Melee_Attack_Chop"
 local ANIM_JUMP_START = "Jump_Start"
 
-local EVENT_POSX = 1
-local EVENT_POSY = 2
-local EVENT_POSZ = 3
-local EVENT_ROTX = 4
-local EVENT_ROTY = 5
-local EVENT_ROTZ = 6
-local EVENT_FORWARD = 7
-local EVENT_TURN = 8
-local EVENT_EULERY = 9
-local EVENT_ATTACK = 10
-local EVENT_JUMP = 11
+local MSG_POS = "pos"
+local MSG_TURN = "turn"
+local MSG_MOVE = "move"
+local MSG_ATTACK = "attack"
+local MSG_JUMP = "jump"
 
 local ACTION_LEFT = hash("left")
 local ACTION_RIGHT = hash("right")
@@ -51,8 +45,8 @@ end
 
 local function turn(self, value)
 	self.rotation = value
-	if self.local_player then
-		realtime.raise_event(false, value, EVENT_TURN)
+	if self.local_player and self.room then
+		self.room:send(MSG_TURN, { value = value })
 	end
 end
 
@@ -63,15 +57,15 @@ local function move(self, value)
 		play_animation(self, ANIM_WALK)
 	end
 	self.forward = value
-	if self.local_player then
-		realtime.raise_event(false, value, EVENT_FORWARD)
+	if self.local_player and self.room then
+		self.room:send(MSG_MOVE, { forward = value })
 	end
 end
 
 local function attack(self)
 	play_animation(self, ANIM_ATTACK, go.PLAYBACK_ONCE_FORWARD)
-	if self.local_player then
-		realtime.raise_event(false, 0, EVENT_ATTACK)
+	if self.local_player and self.room then
+		self.room:send(MSG_ATTACK, {})
 	end
 end
 
@@ -79,35 +73,33 @@ local function jump(self, speed)
 	self.velocity.y = speed
 	self.ground_contact = false
 	play_animation(self, ANIM_JUMP_START, go.PLAYBACK_ONCE_FORWARD)
-	if self.local_player then
-		realtime.raise_event(false, speed, EVENT_JUMP)
+	if self.local_player and self.room then
+		self.room:send(MSG_JUMP, { speed = speed })
 	end
 end
 
-local function handle_event(self, event_code, event_content)
-	if event_code == EVENT_POSX then
-		go.set(".", "position.x", event_content)
-	elseif event_code == EVENT_POSY then
-		go.set(".", "position.y", event_content)
-	elseif event_code == EVENT_POSZ then
-		go.set(".", "position.z", event_content)
-	elseif event_code == EVENT_EULERY then
-		go.set("model", "euler.y",  event_content)
-	elseif event_code == EVENT_FORWARD then
-		move(self, event_content)
-	elseif event_code == EVENT_TURN then
-		turn(self, event_content)
-	elseif event_code == EVENT_ATTACK then
-		attack(self)
-	elseif event_code == EVENT_JUMP then
-		jump(self, event_content)
+local function handle_event(self, event_type, data)
+	if event_type == MSG_POS then
+		-- Defer engine calls to update for remote players
+		self.next_pos = vmath.vector3(data.x, data.y, data.z)
+		self.next_eulerY = data.eulerY
+	elseif event_type == MSG_MOVE then
+		-- Update desired forward; animation handled in update
+		self.forward = data.forward
+	elseif event_type == MSG_TURN then
+		-- Update desired rotation value; applied in update
+		self.rotation = data.value
+	elseif event_type == MSG_ATTACK then
+		self.pending_attack = true
+	elseif event_type == MSG_JUMP then
+		self.pending_jump_speed = data.speed or 0
 	end
 end
 
 
 function init(self)
 	-- rotation around the y-axis
-	-- positive value = rotate clockwise, negative value = rotate counter clockwise, 
+	-- positive value = rotate clockwise, negative value = rotate counter clockwise,
 	self.rotation = 0
 
 	-- movement in direction
@@ -140,34 +132,66 @@ function init(self)
 	model.set_mesh_enabled("model#model", "Rectangle_Shield", false)
 	model.set_mesh_enabled("model#model", "Badge_Shield", false)
 
+	self.room = client.get_room()
+
 	if self.local_player then
 		msg.post(".", "acquire_input_focus")
-		go.set_parent("/camera", go.get_id())
-		-- send position and rotation every 0.5 seconds
-		-- not that rotation and forward movement is sent in
-		-- on_input as soon as it happens
-		self.timerh = timer.delay(0.5, true, function()
-			local pos = go.get_position()
-			realtime.raise_event(false, pos.x, EVENT_POSX)
-			realtime.raise_event(false, pos.y, EVENT_POSY)
-			realtime.raise_event(false, pos.z, EVENT_POSZ)
-			realtime.raise_event(false, go.get("model", "euler.y"), EVENT_EULERY)
-		end)
+		local target = msg.url(msg.url().socket, "/game", "game")
+		msg.post(target, "attach_camera", { player_id = go.get_id() })
 	else
-		client.subscribe(msg.url())
+		-- Remote player will receive network updates via local messages from game.script
 	end
 end
 
 function final(self)
 	if self.local_player then
-		go.set_parent("/camera", nil, true)
-		timer.cancel(self.timerh)
-	else
-		client.unsubscribe(msg.url())
+		-- no timer to cancel
 	end
 end
 
 function update(self, dt)
+	-- Local player: emit position every frame (small payload)
+	if self.local_player and self.room then
+		local pos = go.get_position()
+		self.room:send(MSG_POS, {
+			x = pos.x,
+			y = pos.y,
+			z = pos.z,
+			eulerY = go.get("model", "euler.y"),
+		})
+	end
+
+	-- Remote players: apply buffered state and exit
+	if not self.local_player then
+		if self.next_pos then
+			go.set_position(self.next_pos)
+			self.ground_contact = true
+			self.next_pos = nil
+		end
+		if self.next_eulerY ~= nil then
+			go.set("model", "euler.y", self.next_eulerY)
+			self.next_eulerY = nil
+		end
+		-- Update animation based on forwarded movement intent
+		if self.previous_forward ~= self.forward then
+			if self.forward == 0 then
+				play_animation(self, ANIM_IDLE)
+			else
+				play_animation(self, ANIM_WALK)
+			end
+			self.previous_forward = self.forward
+		end
+		if self.pending_attack then
+			play_animation(self, ANIM_ATTACK, go.PLAYBACK_ONCE_FORWARD)
+			self.pending_attack = nil
+		end
+		if self.pending_jump_speed then
+			play_animation(self, ANIM_JUMP_START, go.PLAYBACK_ONCE_FORWARD)
+			self.pending_jump_speed = nil
+		end
+		return
+	end
+
 	-- rotate model object around the y-axis
 	local rot = go.get_rotation("model")
 	rot = rot * vmath.quat_rotation_y(ROTATION_SPEED * -self.rotation * dt)
@@ -194,7 +218,6 @@ function update(self, dt)
 	self.ground_contact = false
 end
 
-
 function on_message(self, message_id, message, sender)
 	if message_id == MSG_CONTACT_POINT_RESPONSE then
 		-- https://defold.com/manuals/physics-resolving-collisions/
@@ -214,21 +237,21 @@ function on_message(self, message_id, message, sender)
 				self.ground_contact = true
 			end
 		end
-	elseif message_id == client.EVENT then
-		local id = message.id
-		local data = message.data
-		if data.error_code and data.error_code > 0 then
-			print(data.error_string)
-			return
-		end
-		if id == realtime.EVENT_CUSTOMEVENTACTION then
-			if self.player_nr == data.player_nr then
-				handle_event(self, data.event_code, data.event_content)
-			end
-		end
+		return
+	end
+
+	if message_id == hash("net_pos") then
+		handle_event(self, MSG_POS, message)
+	elseif message_id == hash("net_turn") then
+		handle_event(self, MSG_TURN, message)
+	elseif message_id == hash("net_move") then
+		handle_event(self, MSG_MOVE, message)
+	elseif message_id == hash("net_attack") then
+		handle_event(self, MSG_ATTACK, message)
+	elseif message_id == hash("net_jump") then
+		handle_event(self, MSG_JUMP, message)
 	end
 end
-
 
 function on_input(self, action_id, action)
 	if action_id == ACTION_LEFT then

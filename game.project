@@ -1,7 +1,8 @@
 [project]
-title = PhotonRealtime
+title = ColyseusRealtime
 version = 0.1
-dependencies = 
+dependencies#0 = https://github.com/colyseus/colyseus-defold/archive/refs/tags/0.16.0.zip
+dependencies#1 = https://github.com/defold/extension-websocket/archive/refs/tags/4.1.1.zip
 
 [bootstrap]
 main_collection = /example/example.collectionc
@@ -15,9 +16,6 @@ height = 1136
 
 [script]
 shared_state = 1
-
-[library]
-include_dirs = realtime
 
 [render]
 clear_color_red = 0.2

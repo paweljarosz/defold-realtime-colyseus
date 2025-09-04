@@ -3,15 +3,15 @@ local button = require("example.utils.button")
 local client = require("example.client")
 
 local function hide(self, ...)
-	local ids = {...}
-	for _,id in ipairs(ids) do
+	local ids = { ... }
+	for _, id in ipairs(ids) do
 		gui.set_enabled(gui.get_node(id .. "/bg"), false)
 	end
 end
 
 local function show(self, ...)
-	local ids = {...}
-	for _,id in ipairs(ids) do
+	local ids = { ... }
+	for _, id in ipairs(ids) do
 		gui.set_enabled(gui.get_node(id .. "/bg"), true)
 	end
 end
@@ -32,7 +32,7 @@ end
 local function join_random_room(self)
 	log(self, "join_random_room")
 	hide(self, "join_room")
-	local game_id = ""
+	local room_name = "my_room" -- Use the room name defined in server
 	local room_options = {
 		max_players = 4,
 		is_visible = true,
@@ -40,59 +40,56 @@ local function join_random_room(self)
 	}
 	local join_options = {
 	}
-	realtime.join_or_create_random_room(game_id, room_options, join_options)
+	client.join_or_create_room(room_name, room_options, join_options)
 end
 
 local function leave_room(self)
 	log(self, "leave_room")
 	hide(self, "leave_room")
-	local will_come_back = false
-	local send_auth_cookie = false
-	realtime.leave_room(will_come_back, send_auth_cookie)
+	client.leave_room()
 end
 
 local function create_room(self)
 	log(self, "create_room")
 	hide(self, "create_room")
-	local game_id = ""
+	local room_name = "my_room" -- Use the room name defined in server
 	local room_options = {
 		max_players = 4,
 		is_visible = true,
 		is_open = true,
 		lobby_name = "",
-		empty_room_ttl = 10*1000,
+		empty_room_ttl = 10 * 1000,
 	}
-	local expected_users = {}
-	realtime.create_room(game_id, room_options, expected_users)
+	client.create_room(room_name, room_options)
 end
 
 local function join_lobby(self)
 	log(self, "join_lobby")
 	hide(self, "join_lobby")
-	realtime.join_lobby("foolobby", realtime.LOBBYTYPE_DEFAULT)
+	client.join_lobby()
 end
 
 local function leave_lobby(self)
 	log(self, "leave_lobby")
 	hide(self, "leave_lobby")
-	realtime.leave_lobby()
+	client.leave_lobby()
 end
 
 local function connect(self)
 	log(self, "connect")
 	hide(self, "connect")
-	realtime.connect({})
+	client.connect()
 end
 
 local function disconnect(self)
 	log(self, "disconnect")
 	hide(self, "disconnect")
-	realtime.disconnect({})
+	client.disconnect()
 end
 
 local function get_room_list(self)
 	log(self, "get_room_list")
-	local list = realtime.get_room_list()
+	local list = client.get_room_list()
 	log(self, list)
 end
 
@@ -115,10 +112,6 @@ end
 
 function init(self)
 	self.log = {}
-	if not realtime then
-		log(self, "Photon realtime is not available")
-		return
-	end
 	msg.post(".", "acquire_input_focus")
 
 	hide(self, "join_room")
@@ -140,108 +133,121 @@ function final(self)
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == client.EVENT then
-		local id = message.id
-		local data = message.data
-		if id == realtime.EVENT_CONNECTRETURN then
-			if data.error_code == 0 then
-				show(self, "join_room")
-				show(self, "create_room")
-				show(self, "join_lobby")
-				show(self, "disconnect")
-				show(self, "get_room_list")
-			else
-				log(self, data.error_string)
-			end
-		elseif id == realtime.EVENT_ONSECRETRECEIVAL then
-			log(self, "EVENT_ONSECRETRECEIVAL")
-			log(self, data.secret)
-		elseif id == realtime.EVENT_ONROOMLISTUPDATE then
-			log(self, "EVENT_ONROOMLISTUPDATE")
-			log(self, data)
-		elseif id == realtime.EVENT_ONAPPSTATSUPDATE then
-			log(self, "EVENT_ONAPPSTATSUPDATE")
-			log(self, data)
-		elseif id == realtime.EVENT_ONMASTERCLIENTCHANGED then
-			log(self, "EVENT_ONMASTERCLIENTCHANGED")
-			log(self, data)
-		elseif id == realtime.EVENT_JOINRANDOMORCREATEROOMRETURN then
-			log(self, "EVENT_JOINRANDOMORCREATEROOMRETURN")
-			log(self, data)
-			hide(self, "create_room")
-			show(self, "leave_room")
-		elseif id == realtime.EVENT_DISCONNECTRETURN then
-			log(self, "EVENT_DISCONNECTRETURN")
-			log(self, data)
-			show(self, "connect")
-			hide(self, "join_room")
-			hide(self, "join_lobby")
-			hide(self, "create_room")
-			hide(self, "leave_room")
-			hide(self, "get_room_list")
-		elseif id == realtime.EVENT_JOINROOMEVENTACTION then
-			log(self, "EVENT_JOINROOMEVENTACTION")
-			log(self, data)
-		elseif id == realtime.EVENT_LEAVEROOMEVENTACTION then
-			log(self, "EVENT_LEAVEROOMEVENTACTION")
-			log(self, data)
-		elseif id == realtime.EVENT_LEAVEROOMRETURN then
-			log(self, "EVENT_LEAVEROOMRETURN")
-			log(self, data)
+	if message_id ~= client.EVENT then
+		return
+	end
+	local id = message.id
+	local data = message.data
+	if id == client.EVENT_CONNECTRETURN then
+		if data.error_code == 0 then
 			show(self, "join_room")
 			show(self, "create_room")
-		elseif id == realtime.EVENT_CREATEROOMRETURN then
-			log(self, "EVENT_CREATEROOMRETURN")
-			log(self, data)
-			hide(self, "join_room")
-			show(self, "leave_room")
-		elseif id == realtime.EVENT_JOINLOBBYRETURN then
-			log(self, "EVENT_JOINLOBBYRETURN")
-			log(self, data)
-			hide(self, "join_lobby")
-		elseif id == realtime.EVENT_CUSTOMEVENTACTION then
-			-- no-op
+			show(self, "join_lobby")
+			show(self, "disconnect")
+			show(self, "get_room_list")
 		else
-			log(self, "Unhandled event " .. id)
-			log(self, data)
+			log(self, data.error_string)
 		end
+	elseif id == client.EVENT_ONSECRETRECEIVAL then
+		log(self, "EVENT_ONSECRETRECEIVAL")
+		log(self, data.secret)
+	elseif id == client.EVENT_ONROOMLISTUPDATE then
+		log(self, "EVENT_ONROOMLISTUPDATE")
+		log(self, data)
+	elseif id == client.EVENT_ONAPPSTATSUPDATE then
+		log(self, "EVENT_ONAPPSTATSUPDATE")
+		log(self, data)
+	elseif id == client.EVENT_ONMASTERCLIENTCHANGED then
+		log(self, "EVENT_ONMASTERCLIENTCHANGED")
+		log(self, data)
+	elseif id == client.EVENT_JOINRANDOMORCREATEROOMRETURN then
+		log(self, "EVENT_JOINRANDOMORCREATEROOMRETURN")
+		log(self, data)
+		hide(self, "create_room")
+		show(self, "leave_room")
+	elseif id == client.EVENT_DISCONNECTRETURN then
+		log(self, "EVENT_DISCONNECTRETURN")
+		log(self, data)
+		show(self, "connect")
+		hide(self, "join_room")
+		hide(self, "join_lobby")
+		hide(self, "create_room")
+		hide(self, "leave_room")
+		hide(self, "get_room_list")
+	elseif id == client.EVENT_JOINROOMEVENTACTION then
+		log(self, "EVENT_JOINROOMEVENTACTION")
+		log(self, data)
+	elseif id == client.EVENT_LEAVEROOMEVENTACTION then
+		log(self, "EVENT_LEAVEROOMEVENTACTION")
+		log(self, data)
+	elseif id == client.EVENT_LEAVEROOMRETURN then
+		log(self, "EVENT_LEAVEROOMRETURN")
+		log(self, data)
+		show(self, "join_room")
+		show(self, "create_room")
+	elseif id == client.EVENT_CREATEROOMRETURN then
+		log(self, "EVENT_CREATEROOMRETURN")
+		log(self, data)
+		hide(self, "join_room")
+		show(self, "leave_room")
+	elseif id == client.EVENT_ONGETROOMLISTRESPONSE then
+		log(self, "EVENT_ONGETROOMLISTRESPONSE")
+		log(self, data)
+	elseif id == client.EVENT_JOINLOBBYRETURN then
+		log(self, "EVENT_JOINLOBBYRETURN")
+		log(self, data)
+		hide(self, "join_lobby")
+	elseif id == client.EVENT_CUSTOMEVENTACTION then
+		-- no-op
+	else
+		log(self, "Unhandled event " .. id)
+		log(self, data)
 	end
 end
 
 function on_input(self, action_id, action)
 	if not action.x then return end
 	button(self, "connect", action, function()
+		print("connect clicked")
 		connect(self)
 	end)
 	button(self, "disconnect", action, function()
+		print("disconnect clicked")
 		disconnect(self)
 	end)
 
 	button(self, "join_room", action, function()
+		print("join_room clicked")
 		join_random_room(self)
 	end)
 
 	button(self, "leave_room", action, function()
+		print("leave_room clicked")
 		leave_room(self)
 	end)
 
 	button(self, "create_room", action, function()
+		print("create_room clicked")
 		create_room(self)
 	end)
-	
+
 	button(self, "join_lobby", action, function()
+		print("join_lobby clicked")
 		join_lobby(self)
 	end)
 
 	button(self, "leave_lobby", action, function()
+		print("leave_lobby clicked")
 		leave_lobby(self)
 	end)
 
 	button(self, "get_room_list", action, function()
+		print("get_room_list clicked")
 		get_room_list(self)
 	end)
 
 	button(self, "hideshow", action, function()
+		print("hideshow clicked")
 		toggle_panel(self, false)
 	end)
 end

@@ -1,6 +1,6 @@
 local client = require("example.client")
 
-local function spawn_player(self, player_nr)
+local function spawn_player(self, player_nr, session_id)
 	local properties = {
 		[hash("/player")] = {
 			local_player = self.local_player_nr == player_nr,
@@ -10,6 +10,7 @@ local function spawn_player(self, player_nr)
 	local ids = collectionfactory.create("#playerfactory", vmath.vector3(0), nil, properties)
 	local player = {
 		player_nr = player_nr,
+		session_id = session_id,
 		ids = ids,
 		id = ids[hash("/player")],
 	}
@@ -19,6 +20,7 @@ end
 local function delete_player(self, player_nr)
 	local player = self.players[player_nr]
 	if player then
+		print("Removing player", player_nr, player)
 		go.delete(player.id, true)
 		self.players[player_nr] = nil
 	end
@@ -29,10 +31,12 @@ function init(self)
 
 	self.local_player_nr = nil
 	self.players = {}
-	
-	local app_id = "b9d1ec59-9fa5-4713-842b-418aeecf19ab"
-	local app_version = ""
-	client.init(app_id, app_version)
+	self.nr_to_session = {}
+	self.session_to_nr = {}
+
+	local server_addr = "ws://localhost:2567"
+
+	client.init(server_addr)
 	client.subscribe(msg.url())
 end
 
@@ -41,30 +45,82 @@ function final(self)
 end
 
 function update(self, dt)
-	if not realtime then return end
-	realtime.update()
+	client.update(dt)
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == client.EVENT then
-		local id = message.id
-		local data = message.data
-		if data.error_code and data.error_code > 0 then
-			print(data.error_string)
-			return
+	if message_id == hash("attach_camera") then
+		local camera = msg.url(nil, "/camera", nil)
+		if go.exists(camera.path) and message and message.player_id then
+			go.set_parent(camera, message.player_id)
 		end
-		if id == realtime.EVENT_JOINRANDOMORCREATEROOMRETURN then
-			self.local_player_nr = data.local_player_nr
-		elseif id == realtime.EVENT_LEAVEROOMRETURN then
-			delete_player(self, self.local_player_nr)
-		elseif id == realtime.EVENT_JOINROOMEVENTACTION then
-			for i,nr in ipairs(data.player_nrs) do
-				if not self.players[nr] then
+		return
+	end
+
+	-- Forward gameplay messages to remote player instances
+	if message_id == hash("pos") or message_id == hash("turn") or message_id == hash("move") or message_id == hash("attack") or message_id == hash("jump") then
+		local session_id = message.clientId
+		local nr = session_id and self.session_to_nr and self.session_to_nr[session_id]
+		if nr and nr ~= self.local_player_nr then
+			local player = self.players and self.players[nr]
+			if player and player.id then
+				local msg_id = (message_id == hash("pos") and hash("net_pos"))
+					or (message_id == hash("turn") and hash("net_turn"))
+					or (message_id == hash("move") and hash("net_move"))
+					or (message_id == hash("attack") and hash("net_attack"))
+					or (message_id == hash("jump") and hash("net_jump"))
+				if msg_id then msg.post(player.id, msg_id, message) end
+			end
+		end
+		return
+	end
+
+	if message_id ~= client.EVENT then return end
+
+	local id = message.id
+	local data = message.data
+
+	print("EVENT handled in game.script", id)
+
+	if data.error_code and data.error_code > 0 then
+		print(data.error_string)
+		return
+	end
+
+	if id == client.EVENT_JOINROOMRETURN or id == client.EVENT_JOINRANDOMORCREATEROOMRETURN then
+		if not self.players[self.local_player_nr or -1] then
+			self.local_player_nr = 0
+		end
+	elseif id == client.EVENT_JOINROOMEVENTACTION then
+		if data.players then
+			for _, p in ipairs(data.players) do
+				self.nr_to_session[p.player_nr] = p.session_id
+				self.session_to_nr[p.session_id] = p.player_nr
+				if p.session_id == data.my_session then
+					if self.local_player_nr ~= p.player_nr then
+						self.local_player_nr = p.player_nr
+						if not self.players[p.player_nr] then
+							spawn_player(self, p.player_nr, p.session_id)
+						end
+					end
+				else
+					if not self.players[p.player_nr] then
+						spawn_player(self, p.player_nr, p.session_id)
+					end
+				end
+			end
+		elseif data.player_nrs then
+			for _, nr in ipairs(data.player_nrs) do
+				if nr ~= self.local_player_nr and not self.players[nr] then
 					spawn_player(self, nr)
 				end
 			end
-		elseif id == realtime.EVENT_LEAVEROOMEVENTACTION then
+		end
+	elseif id == client.EVENT_LEAVEROOMEVENTACTION then
+		if data and data.player_nr then
 			delete_player(self, data.player_nr)
 		end
+	elseif id == client.EVENT_LEAVEROOMRETURN then
+		delete_player(self, self.local_player_nr)
 	end
 end

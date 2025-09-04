@@ -3,3 +3,6 @@
 .DS_Store
 Thumbs.db
 /.editor_settings
+/.vscode
+/debugger
+/server
